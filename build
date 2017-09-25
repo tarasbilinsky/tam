@@ -1,0 +1,20 @@
+#!/bin/bash
+
+rm -rf ./target/universal/stage/*
+/usr/local/sbt/bin/sbt stage
+
+# Remove webjars, these are already externalized
+sourcejar=net.oltiv.tam-0.0.1-sans-externalized.jar
+sourcedir=./target/universal/stage/lib
+tmpdir=./target/universal/stage/tmp
+rm -f ${tmpdir}
+mkdir ${tmpdir}
+unzip -q ${sourcedir}/${sourcejar} -d ${tmpdir}
+rm -f ${sourcedir}/${sourcejar}
+rm -rf ${tmpdir}/META-INF/
+
+cd ${tmpdir}/
+zip -rq ./../lib/${sourcejar} ./*
+cd ../../../../
+
+rm -f ${tmpdir}

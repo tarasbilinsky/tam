@@ -1,0 +1,5 @@
+@import base.controllers.EnvironmentAll
+@import base.MyConfigImplicit.MyConfig
+@*------------------------------------*@
+@(styles: scala.List[String])(implicit env: EnvironmentAll, request: Request[AnyContent])
+@for(css <- styles){<link rel="stylesheet" href="/assets/css/@{css}.css?v=@env.config.appVersion">}

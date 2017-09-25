@@ -1,0 +1,20 @@
+@import base.controllers.EnvironmentAll
+@import base.MyConfigImplicit.MyConfig
+@import base.views.html.inc._
+@import base.controllers.RequestWrapperForTemplates.requestToGenericRequest
+@import models.UserRoles._
+
+@*------------------------------------*@
+@()(implicit env: EnvironmentAll, request: Request[AnyContent])
+@main("Settings"){
+    <ul>
+        @request.getUser.foreach{u =>
+            @if(u.getPrimaryRole == SuperAdmin){
+
+            }
+            @if(u.getPrimaryRole == Admin){
+                <li><a href="/settings/???">Setting</a></li>
+            }
+        }
+    </ul>
+}

@@ -13,4 +13,17 @@ GET     /message                    controllers.AsyncController.message
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
+
+GET /privacy-policy                         controllers.Assets.at(path="/public", file="privacy.html")
+GET         /favicon.ico                      controllers.Assets.at(path="/public", file="favicon.ico")
+
+POST        /Application/reportJSError        controllers.Application.reportJSError
+
+POST        /application/feedback             controllers.Application.feedback
+POST        /auth                             controllers.Application.auth
+GET         /authIntegration                  controllers.Application.authIntegration(token:String)
+
+GET         /login                            controllers.Application.login
+GET         /logout                           controllers.Application.logout
+
       

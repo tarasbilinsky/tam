@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ssh -o StrictHostKeyChecking=no -i ~/.aws/taras/tam.pem ec2-user@ec2-???.compute-1.amazonaws.com

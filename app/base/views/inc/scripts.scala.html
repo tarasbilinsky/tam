@@ -1,0 +1,7 @@
+@import base.controllers.EnvironmentAll
+@import base.MyConfigImplicit.MyConfig
+@*------------------------------------*@
+@(scripts: scala.List[String])(implicit env: EnvironmentAll, request: Request[AnyContent])
+@for(js <- scripts){
+    <script src="@if(js.toLowerCase.startsWith("http")){@js}else{/assets/js/@{js}.js?v=@env.config.appVersion}"></script>
+}

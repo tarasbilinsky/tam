@@ -1,0 +1,42 @@
+#!/bin/bash
+
+~/.aws/taras/awskey
+
+cd ./target/universal/stage/
+
+ts=`date +%Y-%m-%d--%H-%M-%S`
+
+
+rm -f ./conf/application1.conf
+while read a ; do echo ${a//VERSIONTIMESTAMP/${ts}} ; done < ./conf/${1-prod}/application.conf > ./conf/application1.conf
+rm -f ./conf/application.conf
+while read a ; do echo ${a//tam./tam$2.} ; done < ./conf/application1.conf > ./conf/application.conf
+rm -f ./conf/application1.conf
+
+cp -f ./conf/${1-prod}/logback.xml ./conf/logback.xml
+
+rm -f ./conf/test-ebean.properties
+cp -f ./conf/${1-prod}/ebean.properties ./conf/ebean.properties
+
+rm -rf ./conf/evolutions
+rm -f ./bin/*.bat
+rm -rf ./share
+
+cp -f ./${1-prod}/* ./
+#rm -rf ./prod
+#rm -rf ./staging
+
+mv ./lib/net.oltiv.tam*.jar ./
+rm -f ./lib/*.jar
+mv ./net.oltiv.tam*.jar ./lib/
+
+rm -f ./RUNNING_PID
+
+rm -f tam.zip
+zip -rq tam.zip .
+
+aws s3 cp tam.zip s3://tam-deploy/tam-${1-prod}-$ts.zip
+aws elasticbeanstalk create-application-version --application-name tam-cluster --version-label tam-${1-prod}-$ts --source-bundle S3Bucket="tam-deploy",S3Key="tam-${1-prod}-$ts.zip"
+eb deploy tam-cluster-${2-prod} -v --version tam-${1-prod}-$ts
+
+cd ../../..

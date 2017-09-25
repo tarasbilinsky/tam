@@ -1,0 +1,128 @@
+@import models.feedback.FeedbackType
+@import models.feedback.FeedbackArea
+@import base.models.UserBase
+
+@(user: Option[UserBase] ,types: Seq[FeedbackType] = List() , areaIdOption: Option[Long] = None, title:String = "Report a Problem", primary:Boolean = true, claimId: Option[Long] = None, sessionId: Option[String] = None)
+
+@for(x<-Some(1);areaId=areaIdOption.map(_.toString).getOrElse("")){
+    @if(primary){
+        <script>
+            function feedbackFormShow(areaId){
+                feedbackFormReset(areaId);
+                $('#feedbackFormTimestamp'+areaId).val(new Date().getTime());
+                var feedbackForm = $('#feedbackForm'+areaId);
+                feedbackForm.on('shown.bs.modal', function () {
+                    $('#@if(types.isEmpty){feedbackFormTitleOther}else{feedbackFormType}'+areaId).focus();
+                });
+                feedbackForm.modal({});
+            }
+            function feedbackFormToggleOther(areaId,t){
+                var other = $('#feedbackFormTitleOther'+areaId);
+                var isOther = t;
+                other.css('display',isOther?'block':'none');
+                if(isOther) other.focus();
+            }
+            function feedbackFormReset(areaId) {
+                var other = $('#feedbackFormTitleOther'+areaId);
+                var description = $('#feedbackFormDescription'+areaId);
+                //$('#feedbackFormType').val('');
+                $('.form-check-input-'+areaId).prop('checked', false);
+                other.css('display',@if(types.isEmpty){'block'} else {'none'});
+                other.css('background-color','inherit');
+                other.val("");
+                description.css('display','none');
+                description.val("");
+                $('#feedbackFormAddDescription'+areaId).show();
+            }
+            function feedbackFormSubmit(areaId,userId){
+
+                var otherE = $('#feedbackFormTitleOther'+areaId);
+                if(otherE.css('display')==='block'){
+                    var other = otherE.val();
+                    if(!other){
+                        otherE.focus();
+                        otherE.css('background-color', 'red');
+                        return false;
+                    }
+                }
+
+                var url = location.pathname;
+                var form = document.forms["feedbackFormForm"+areaId];
+                var type = form.feedbackFormType.value;
+                var typeOther = form.feedbackFormTitleOther.value;
+                var description = form.feedbackFormDescription.value;
+                var timestamp = form.feedbackFormTimestamp.value;
+                var data = {
+                    areaId : areaId,
+                    url: url,
+                    type: type,
+                    typeOther: typeOther,
+                    description: description,
+                    userId: userId,
+                    timestamp: timestamp
+                };
+                @claimId.map{id=>data.claimId=@id;}
+                @sessionId.map{id=>data.sessionId="@id";}
+                $.ajax({
+                    url: "/application/feedback",
+                    type: "POST",
+                    data: data
+                });
+                feedbackFormReset(areaId);
+
+                var feedbackForm = $('#feedbackForm'+areaId);
+                feedbackForm.modal('hide');
+                return true;
+            }
+        </script>
+    }
+
+    <div class="modal fade" id="feedbackForm@areaId" tabindex="-1" role="dialog" aria-labelledby="feedbackFormLabel@areaId" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="feedbackFormLabel@areaId">@title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="feedbackFormForm@areaId" name="feedbackFormForm@areaId" onsubmit="feedbackFormSubmit(@areaId,'@user.map(_.id.toString).getOrElse("")');return false;">
+                        <div class="form-group">
+                            @if(!types.isEmpty){
+                                <fieldset class="form-group">
+                                    @for(t <- types){
+                                        <div class="form-check">
+                                            <label class="form-check-label">
+                                                <input type="radio" class="form-check-input form-check-input-@areaId" name="feedbackFormType" id="feedbackFormType@areaId-@t.id" value="@t.id" onclick="feedbackFormToggleOther(@areaId,false);">
+                                                @t.title
+                                            </label>
+                                        </div>
+                                    }
+                                    <div class="form-check">
+                                        <label class="form-check-label">
+                                            <input type="radio" class="form-check-input form-check-input-@areaId" name="feedbackFormType" id="feedbackFormTypeOther@areaId" value="0" onclick="feedbackFormToggleOther(@areaId,true);">
+                                            Other
+                                        </label>
+                                    </div>
+                                </fieldset>
+                            } else {
+                                <input type="hidden" id="feedbackFormType@areaId" value="" name="feedbackFormType">
+                            }
+                            <input type="hidden" id="feedbackFormTimestamp@areaId" name="feedbackFormTimestamp" value="">
+                            <input onkeydown="$(this).css('background-color','inherit')" type="text" placeholder="short description 2-3 words" class="form-control" id="feedbackFormTitleOther@areaId" name="feedbackFormTitleOther" @if(!types.isEmpty){style="display: none;"}>
+                        </div>
+                        <div class="form-group">
+                            <a href="#" id ="feedbackFormAddDescription@areaId" onclick="$(this).hide(); $('#feedbackFormDescription@areaId').css('display','block'); $('#feedbackFormDescription@areaId').focus(); return false;">Add Detailed Description</a>
+                            <textarea class="form-control" style="display: none; height: 7em;" id="feedbackFormDescription@areaId" name="feedbackFormDescription"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="$('#feedbackFormForm@areaId').submit();">Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

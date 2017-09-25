@@ -1,23 +1,73 @@
-@*
- * This template is called from the `index` template. This template
- * handles the rendering of the page header and body tags. It takes
- * two arguments, a `String` for the title of the page and an `Html`
- * object to insert into the body of the page.
- *@
-@(title: String)(content: Html)
+@import base.controllers.EnvironmentAll
+@import base.MyConfigImplicit.MyConfig
+@import base.controllers.SecureRequest
+@import base.controllers.MayBeSecureRequest
+@import base.models.UserBase
+@import base.controllers.RequestWrapperForTemplates.requestToGenericRequest
+@import models.UserRoles._
+@import models.feedback.FeedbackTypes
 
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        @* Here's where we render the page title `String`. *@
-        <title>@title</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
-        <script src="@routes.Assets.versioned("javascripts/hello.js")" type="text/javascript"></script>
-    </head>
-    <body>
-        @* And here's where we render the `Html` object containing
-         * the page content. *@
+@*------------------------------------*@
+@(
+        title: String,
+        styles: scala.List[String]=scala.List(),
+        headerOn: scala.Boolean = true,
+        feedbackAreaId: Option[scala.Long] = Some(4)
+)(
+        content: Html
+)(implicit env: EnvironmentAll, request: Request[AnyContent])
+@base.views.html.main(title,styles :+ "main"){
+
+    @for(areaId <- feedbackAreaId ) {
+        @feedbackForm(request.getUser,FeedbackTypes(areaId),Some(areaId))
+    }
+
+    @if(headerOn) {
+        <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="/"><img height="27" id="logo" src="/assets/img/logo.png"></a>
+
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    @request.getUser.fold{
+
+                    } { user =>
+                      XXX
+                    }
+                </ul>
+
+
+
+                <ul class="nav navbar-nav pull-xs-right">
+                    @feedbackAreaId.map {areaId =>
+                        <li class=nav-item>
+                            <a class="nav-link nav-link-problem" href="#" onclick="feedbackFormShow(@areaId);return false;">Report a Problem</a>
+                        </li>
+                    }
+                    <li class=nav-item>
+                        @request.getUser.fold {
+                            <a class="nav-link" href="/login">
+                                Log In
+                            </a>
+                        } { user =>
+                            <a class="nav-link" href="/logout">
+                                @** @user.id **@
+                                @user.name
+                                @** - @user.getPrimaryRole() **@
+                                    - Log Out
+                            </a>
+                        }
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    }
+    <div class="container" style="margin-top: 4em;">
         @content
-    </body>
-</html>
+    </div>
+}

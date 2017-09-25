@@ -1,0 +1,58 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "networkMode": "bridge",
+
+
+  "volumes": [
+    {
+      "name": "play-app",
+      "host": {
+        "sourcePath": "/var/app/current"
+      }
+    }
+  ],
+
+
+  "containerDefinitions": [
+
+
+
+
+    {
+      "name": "play-app",
+      "image": "java:8",
+      "memory": 5120,
+      "essential": true,
+      "portMappings": [
+        {
+          "hostPort": 9001,
+          "containerPort": 9001
+        },
+        {
+          "hostPort": 80,
+          "containerPort": 9000
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "awseb-logs-play-app",
+          "containerPath": "/var/log/play"
+        },
+        {
+          "sourceVolume": "play-app",
+          "containerPath": "/var/app/current"
+        }
+      ],
+      "workingDirectory":"/var/app/current",
+      "entryPoint": [
+        "./launcher.sh"
+      ]
+    }
+
+
+
+
+
+
+  ]
+}

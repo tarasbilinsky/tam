@@ -1,0 +1,20 @@
+@import base.controllers.EnvironmentAll
+@import base.MyConfigImplicit.MyConfig
+@import base.models.ModelBase
+@import base.viewHelpers.DataGrid
+@import views.Style
+
+@(
+    t: DataGrid[M] forSome {type M <: ModelBase},
+    containerId:String
+)(implicit env: EnvironmentAll, request: Request[AnyContent])
+
+<table class="table table-bordered table-sm @Style.template" id="@containerId">
+    <thead><tr><th class="{{styleTitle}}" id="@containerId-column-{{id}}">{{title}}</th></tr></thead>
+    <tbody><tr id="@containerId-{{id}}" class="{{styleRow}}"><td class="{{styleField}}">{{value}}</td></tr></tbody>
+    <tfoot><tr><td>{{value}}</td></tr></tfoot>
+</table>
+<script>
+        TableViewController.init(@{t.dataJsonHtml}, @{t.columnsJsonHtml}, @{t.idColumnNumber}, "@containerId", @{t.highlightFieldJsonHtml});
+</script>
+

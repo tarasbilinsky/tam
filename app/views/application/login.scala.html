@@ -1,0 +1,38 @@
+@import base.controllers.EnvironmentAll
+@import base.MyConfigImplicit.MyConfig
+@import base.views.html.inc._
+@*------------------------------------*@
+@(form: play.api.data.Form[(Option[User],Boolean)])(implicit env: EnvironmentAll, request: Request[AnyContent], flash: play.api.mvc.Flash)
+@main("Log In", List("login"),headerOn = false){
+    <form class="form-signin" action="/auth" method="post">
+        @if(form.hasErrors){
+            <div class="alert alert-danger" role="alert">
+            @form.errors.map{
+                case err:FormError => {
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Error:</span>
+                    @err.message
+                }
+            }
+            </div>
+        }
+        <h3>Log In</h3>
+
+        <label for="inputUserName" class="sr-only">User name</label>
+        <input name="userName" type="text" id="inputUserName" class="form-control" placeholder="User name" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" value="true" name="rememberMe" checked> Remember me
+            </label>
+        </div>
+        <button class="btn btn-lg btn-success btn-block" type="submit">Log In</button>
+
+
+
+    </form>
+
+    @bootstrapAndJquery()
+}

@@ -4,7 +4,7 @@ project/target
 target
 tmp
 .history
-dist
+#dist
 /.idea
 /*.iml
 /out
@@ -13,3 +13,13 @@ dist
 /.project
 /RUNNING_PID
 /.settings
+
+/conf/prod
+/conf/stage
+aws.conf
+mail.conf
+mail.xml
+ebean.conf
+ebean.properties
+secret.conf
+twilio.conf

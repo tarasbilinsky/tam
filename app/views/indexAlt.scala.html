@@ -1,0 +1,8 @@
+@import base.controllers.EnvironmentAll
+@import base.MyConfigImplicit.MyConfig
+@import base.views.html.inc._
+@*------------------------------------*@
+@(m: String)(implicit env: EnvironmentAll, request: Request[AnyContent])
+@main("indexAlt"){
+    @m
+}
