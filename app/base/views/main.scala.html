@@ -2,7 +2,7 @@
 @import base.MyConfigImplicit.MyConfig
 @import base.utils.Formatter._
 
-@(title: String = null, styles: scala.List[String]=scala.List())(content: Html)(implicit env: EnvironmentAll, request: Request[AnyContent])
+@(title: String = null, styles: scala.List[String]=scala.List(), scripts: scala.List[String]= List())(content: Html)(implicit env: EnvironmentAll, request: Request[AnyContent])
 
 @for(
     pageTitle <- Some( (title ?: "") + " - " + env.config.appName );
@@ -20,10 +20,10 @@
     @if(!isDevMode && !isStagingMode){@inc.jsErrorsMonitoring()}
     <title>@pageTitle</title>
     @for(css <- pageStyles){<link rel="stylesheet" href="/assets/css/@{css}.css?v=@env.config.appVersion">}
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 </head>
 <body>
     @content
+    @inc.scripts(scripts)
 </body>
 </html>
 }
